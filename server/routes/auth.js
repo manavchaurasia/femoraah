@@ -73,14 +73,31 @@ router.post('/register', authenticate, authorize('super_admin'), async (req, res
   }
 });
 
+const PIN_MAP = {
+  '00': 'kartik@femoraah.com',
+  '0': 'kartik@femoraah.com',
+  '01': 'shruti@femoraah.com',
+  '1': 'shruti@femoraah.com',
+  '02': 'zinia@femoraah.com',
+  '2': 'zinia@femoraah.com',
+  '03': 'sanket@femoraah.com',
+  '3': 'sanket@femoraah.com',
+  '04': 'dev@femoraah.com',
+  '4': 'dev@femoraah.com',
+  '78': 'maanavc2006@gmail.com'
+};
+
 // @route   POST /api/auth/login
-// @desc    Login with email (Auto-provisions user if new, assigns super_admin to owners)
+// @desc    Login with Member ID / PIN or email
 router.post('/login', async (req, res) => {
   try {
-    const emailRaw = (req.body.email || '').trim().toLowerCase();
-    if (!emailRaw) {
-      return res.status(400).json({ message: 'Email address is required' });
+    const rawInput = (req.body.id || req.body.pin || req.body.email || '').toString().trim();
+    if (!rawInput) {
+      return res.status(400).json({ message: 'Member ID or PIN is required' });
     }
+
+    const resolvedEmail = PIN_MAP[rawInput] || rawInput.toLowerCase();
+    const emailRaw = resolvedEmail.toLowerCase();
 
     const { isDbConnected, users } = require('../utils/mockStore');
     let user;

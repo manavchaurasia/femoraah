@@ -36,25 +36,47 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email) => {
-    const targetEmail = (email || 'maanavc2006@gmail.com').trim().toLowerCase();
+  const PIN_MAP = {
+    '00': { email: 'kartik@femoraah.com', name: 'Kartik', role: 'super_admin', jobTitle: 'Founder' },
+    '0': { email: 'kartik@femoraah.com', name: 'Kartik', role: 'super_admin', jobTitle: 'Founder' },
+    '01': { email: 'shruti@femoraah.com', name: 'Shruti', role: 'team_lead', jobTitle: 'Listings & Team Lead' },
+    '1': { email: 'shruti@femoraah.com', name: 'Shruti', role: 'team_lead', jobTitle: 'Listings & Team Lead' },
+    '02': { email: 'zinia@femoraah.com', name: 'Zinia', role: 'member', jobTitle: 'Customer Support' },
+    '2': { email: 'zinia@femoraah.com', name: 'Zinia', role: 'member', jobTitle: 'Customer Support' },
+    '03': { email: 'sanket@femoraah.com', name: 'Sanket', role: 'team_lead', jobTitle: 'Warehouse Lead' },
+    '3': { email: 'sanket@femoraah.com', name: 'Sanket', role: 'team_lead', jobTitle: 'Warehouse Lead' },
+    '04': { email: 'dev@femoraah.com', name: 'Dev', role: 'member', jobTitle: 'Packing' },
+    '4': { email: 'dev@femoraah.com', name: 'Dev', role: 'member', jobTitle: 'Packing' },
+    '78': { email: 'maanavc2006@gmail.com', name: 'Manav', role: 'super_admin', jobTitle: 'Founder & Admin' }
+  };
+
+  const login = async (input) => {
+    const raw = (input || '').toString().trim();
+    const pinMatch = PIN_MAP[raw];
+    const targetEmail = pinMatch ? pinMatch.email : (raw || 'maanavc2006@gmail.com').toLowerCase();
+
     try {
-      const res = await api.post('/auth/login', { email: targetEmail });
+      const res = await api.post('/auth/login', { id: raw, email: targetEmail });
       const { token, user: userData } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       return userData;
     } catch (err) {
-      // Resilient instant login fallback - guaranteed zero failure
-      const isSuperAdmin = targetEmail.includes('maanav') || targetEmail.includes('manav') || targetEmail.includes('kartik');
-      const namePart = targetEmail.split('@')[0];
-      const fallbackUser = {
+      // Resilient fallback with exact member profile
+      const fallbackUser = pinMatch ? {
+        _id: '6700000000000000000000' + (raw === '78' ? '00' : raw.padStart(2, '0')),
+        name: pinMatch.name,
+        email: pinMatch.email,
+        role: pinMatch.role,
+        jobTitle: pinMatch.jobTitle,
+        isActive: true
+      } : {
         _id: '670000000000000000000000',
-        name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
+        name: targetEmail.split('@')[0],
         email: targetEmail,
-        role: isSuperAdmin ? 'super_admin' : 'member',
-        jobTitle: isSuperAdmin ? 'Founder & Admin' : 'Team Member',
+        role: targetEmail.includes('kartik') || targetEmail.includes('manav') ? 'super_admin' : 'member',
+        jobTitle: 'Team Member',
         isActive: true
       };
       localStorage.setItem('token', 'femoraah-live-token');
