@@ -9,27 +9,33 @@ const router = express.Router();
 
 // Generate JWT token
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const secret = process.env.JWT_SECRET || 'femoraah-default-jwt-secret-2026';
+  return jwt.sign({ userId }, secret, { expiresIn: '7d' });
 };
 
 // =================== Google OAuth Routes ===================
 
 // @route   GET /api/auth/google
 // @desc    Initiate Google OAuth
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+router.get('/google', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(503).json({ message: 'Google OAuth is not configured. Please login with Email/Password.' });
+  }
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
 // @route   GET /api/auth/google/callback
 // @desc    Google OAuth callback
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login?error=auth_failed' }),
-  (req, res) => {
-    const token = generateToken(req.user._id);
-    // Redirect to frontend with token
-    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}`);
+router.get('/google/callback', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.redirect('/login?error=oauth_not_configured');
   }
-);
+  passport.authenticate('google', { failureRedirect: '/login?error=auth_failed' })(req, res, () => {
+    const token = generateToken(req.user._id);
+    const clientUrl = process.env.CLIENT_URL || '';
+    res.redirect(`${clientUrl}/auth/callback?token=${token}`);
+  });
+});
 
 // =================== Email/Password Auth (Fallback) ===================
 

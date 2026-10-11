@@ -10,7 +10,8 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'femoraah-default-jwt-secret-2026';
+    const decoded = jwt.verify(token, secret);
     let user;
     const { isDbConnected, users } = require('../utils/mockStore');
     if (isDbConnected()) {
