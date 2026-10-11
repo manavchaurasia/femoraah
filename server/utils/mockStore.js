@@ -3,6 +3,17 @@ const mongoose = require('mongoose');
 
 const users = [
   {
+    _id: '670000000000000000000000',
+    name: 'Manav',
+    email: 'maanavc2006@gmail.com',
+    role: 'super_admin',
+    jobTitle: 'Founder & Admin',
+    expertise: 'Full Operations & System Admin',
+    maxOpenTasks: 20,
+    isActive: true,
+    avatar: ''
+  },
+  {
     _id: '670000000000000000000001',
     name: 'Kartik',
     email: 'kartik@femoraah.com',

@@ -27,8 +27,10 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || '';
-    window.location.href = `${apiUrl}/api/auth/google`;
+    toast('Google OAuth is not configured yet on cloud. Please enter your email or click a Quick Login button below to sign in instantly!', {
+      icon: 'ℹ️',
+      duration: 5000
+    });
   };
 
   // Quick login buttons for demo
@@ -39,7 +41,7 @@ const Login = () => {
       toast.success('Welcome back!');
       navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed. Run seed first.');
+      toast.error(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +77,7 @@ const Login = () => {
               <input 
                 type="email" 
                 className="form-input" 
-                placeholder="kartik@femoraah.com"
+                placeholder="maanavc2006@gmail.com or kartik@femoraah.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -96,6 +98,7 @@ const Login = () => {
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {[
+                { name: 'Manav', email: 'maanavc2006@gmail.com', role: 'Admin' },
                 { name: 'Kartik', email: 'kartik@femoraah.com', role: 'Admin' },
                 { name: 'Shruti', email: 'shruti@femoraah.com', role: 'Lead' },
                 { name: 'Sanket', email: 'sanket@femoraah.com', role: 'Lead' },

@@ -74,24 +74,55 @@ router.post('/register', authenticate, authorize('super_admin'), async (req, res
 });
 
 // @route   POST /api/auth/login
-// @desc    Login with email (simplified - for demo purposes, no password needed if Google OAuth is primary)
+// @desc    Login with email (Auto-provisions user if new, assigns super_admin to owners)
 router.post('/login', async (req, res) => {
   try {
-    const { email } = req.body;
+    const emailRaw = (req.body.email || '').trim().toLowerCase();
+    if (!emailRaw) {
+      return res.status(400).json({ message: 'Email address is required' });
+    }
+
     const { isDbConnected, users } = require('../utils/mockStore');
     let user;
 
     if (isDbConnected()) {
-      user = await User.findOne({ email, isActive: true });
+      user = await User.findOne({ email: emailRaw, isActive: true });
     } else {
-      user = users.find(u => u.email.toLowerCase() === (email || '').toLowerCase() && u.isActive);
+      user = users.find(u => u.email.toLowerCase() === emailRaw && u.isActive);
     }
 
+    // If user does not exist, auto-create them seamlessly
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials or user not found' });
+      const isSuperAdmin = emailRaw.includes('kartik') || emailRaw.includes('maanav') || emailRaw.includes('manav');
+      const namePart = emailRaw.split('@')[0];
+      const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+
+      if (isDbConnected()) {
+        user = await User.create({
+          email: emailRaw,
+          name: displayName,
+          role: isSuperAdmin ? 'super_admin' : 'member',
+          jobTitle: isSuperAdmin ? 'Founder / Super Admin' : 'Team Member',
+          expertise: isSuperAdmin ? 'Full System & Operations' : 'General Tasks',
+          maxOpenTasks: isSuperAdmin ? 20 : 10,
+          isActive: true
+        });
+      } else {
+        user = {
+          _id: new (require('mongoose').Types.ObjectId)().toString(),
+          email: emailRaw,
+          name: displayName,
+          role: isSuperAdmin ? 'super_admin' : 'member',
+          jobTitle: isSuperAdmin ? 'Founder / Super Admin' : 'Team Member',
+          expertise: isSuperAdmin ? 'Full System & Operations' : 'General Tasks',
+          maxOpenTasks: isSuperAdmin ? 20 : 10,
+          isActive: true
+        };
+        users.push(user);
+      }
     }
 
-    if (isDbConnected()) {
+    if (isDbConnected() && typeof user.save === 'function') {
       user.lastLogin = new Date();
       await user.save();
     }
@@ -105,12 +136,13 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        avatar: user.avatar,
-        jobTitle: user.jobTitle
+        avatar: user.avatar || '',
+        jobTitle: user.jobTitle || 'Team Member'
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ message: error.message || 'Login failed' });
   }
 });
 

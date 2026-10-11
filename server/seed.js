@@ -30,6 +30,14 @@ const seedData = async () => {
     console.log('🌱 Seeding Team Members...');
     const users = await User.insertMany([
       {
+        name: 'Manav',
+        email: 'maanavc2006@gmail.com',
+        role: 'super_admin',
+        jobTitle: 'Founder & Admin',
+        expertise: 'Full Operations & System Admin',
+        maxOpenTasks: 20
+      },
+      {
         name: 'Kartik',
         email: 'kartik@femoraah.com',
         role: 'super_admin',
