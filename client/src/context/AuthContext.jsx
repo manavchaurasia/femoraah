@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     '3': { email: 'sanket@femoraah.com', name: 'Sanket', role: 'team_lead', jobTitle: 'Warehouse Lead' },
     '04': { email: 'dev@femoraah.com', name: 'Dev', role: 'member', jobTitle: 'Packing' },
     '4': { email: 'dev@femoraah.com', name: 'Dev', role: 'member', jobTitle: 'Packing' },
-    '78': { email: 'maanavc2006@gmail.com', name: 'Manav', role: 'super_admin', jobTitle: 'Founder & Admin' }
+    '78': { email: 'maanavc2006@gmail.com', name: 'Manav', role: 'member', jobTitle: 'Team Member' }
   };
 
   const login = async (input) => {
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       // Resilient fallback with exact member profile
       const fallbackUser = pinMatch ? {
-        _id: '6700000000000000000000' + (raw === '78' ? '00' : raw.padStart(2, '0')),
+        _id: '6700000000000000000000' + (raw === '78' ? '78' : raw.padStart(2, '0')),
         name: pinMatch.name,
         email: pinMatch.email,
         role: pinMatch.role,
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         _id: '670000000000000000000000',
         name: targetEmail.split('@')[0],
         email: targetEmail,
-        role: targetEmail.includes('kartik') || targetEmail.includes('manav') ? 'super_admin' : 'member',
+        role: targetEmail.includes('kartik') ? 'super_admin' : 'member',
         jobTitle: 'Team Member',
         isActive: true
       };

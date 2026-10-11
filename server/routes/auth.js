@@ -110,7 +110,7 @@ router.post('/login', async (req, res) => {
 
     // If user does not exist, auto-create them seamlessly
     if (!user) {
-      const isSuperAdmin = emailRaw.includes('kartik') || emailRaw.includes('maanav') || emailRaw.includes('manav');
+      const isSuperAdmin = emailRaw.includes('kartik');
       const namePart = emailRaw.split('@')[0];
       const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
 

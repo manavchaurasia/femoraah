@@ -32,10 +32,10 @@ const seedData = async () => {
       {
         name: 'Manav',
         email: 'maanavc2006@gmail.com',
-        role: 'super_admin',
-        jobTitle: 'Founder & Admin',
-        expertise: 'Full Operations & System Admin',
-        maxOpenTasks: 20
+        role: 'member',
+        jobTitle: 'Team Member',
+        expertise: 'Operations & Execution',
+        maxOpenTasks: 10
       },
       {
         name: 'Kartik',
