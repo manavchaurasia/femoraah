@@ -10,7 +10,8 @@ try {
 
 const connectDB = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/task-tracker';
+    const defaultUri = 'mongodb+srv://maanavc2006_db_user:manav782020@cluster0.trt1bcc.mongodb.net/femoraah?retryWrites=true&w=majority&appName=Cluster0';
+    const mongoUri = process.env.MONGODB_URI || defaultUri;
     const conn = await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 8000
     });
